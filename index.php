@@ -60,13 +60,23 @@ class Request
 
 class Response
 {
-    public function render($callback)
+    private $status = 200;
+
+    public function json($json, $message = '')
     {
-        if(isset($callback)){
-            $callback();
-        } else {
-            echo '404';
-        }
+        $response = [
+            'status' => $this->status,
+            'data' => $json,
+            'message' => $message
+        ];
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+
+    public function status($code)
+    {
+        $this->status = $code;
+        return $this;
     }
 }
 
@@ -126,6 +136,15 @@ class Router
         return str_replace('~', $url, $base);
     }
 
+    public function set_route($callback)
+    {
+        if(isset($callback)){
+            $callback($this->request, $this->response);
+        } else {
+            echo '404';
+        }
+    }
+
     public function listen()
     {
         $notFound = True;
@@ -133,7 +152,7 @@ class Router
             $method = $this->request->method;
             if(preg_match($route->url, $this->request->url)) {
                 $this->request->clean_params($route->url);
-                $this->response->render($route->methods[$method]);
+                $this->set_route($route->methods[$method]);
                 $notFound = False;
                 break;
             }
@@ -146,19 +165,20 @@ class Router
 
 $router = new Router($request, $response);
 
-$router->get('/model/{id}/', function () {
-    echo 'hello';
+$router->get('/model/{id}/', function ($req, $res) {
+    $test = ['name' => 'Hello World!'];
+    $res->status(400)->json($test);
 });
 
-$router->get('/model/{id}/test/{test}/', function () {
+$router->get('/model/{id}/test/{test}/', function ($req, $res) {
     echo 'the separeteed';
 });
 
-$router->post('/model/{id}', function() {
+$router->post('/model/{id}', function($req, $res) {
     echo 'actionnnn';
 });
 
-$router->get('/model', function() {
+$router->get('/model', function($req, $res) {
     echo '/model/';
 });
 
