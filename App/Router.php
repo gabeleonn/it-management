@@ -25,6 +25,18 @@ class Router
         $this->addRoute($url, $method, $callback);
     }
 
+    public function patch($url, $callback, $method='PATCH')
+    {
+        $url = $this->generate_regex($url);
+        $this->addRoute($url, $method, $callback);
+    }
+
+    public function delete($url, $callback, $method='DELETE')
+    {
+        $url = $this->generate_regex($url);
+        $this->addRoute($url, $method, $callback);
+    }
+
     public function addRoute($url, $method ,$callback)
     {
         if(isset($this->routes[$url])) {

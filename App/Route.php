@@ -5,6 +5,7 @@ class Route
 {
     public $url = '';
     public $methods = [];
+    public $params = [];
 
     public function __construct($url, $method, $callback)
     {

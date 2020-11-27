@@ -21,16 +21,28 @@ $router->get('/model/{id}/', function ($req, $res) {
     return $res->status(400)->json();
 });
 
-$router->get('/model/{id}/test/{test}/', function ($req, $res) {
-    echo 'the separeteed';
+$router->post('/model/{id}/', function ($req, $res) {
+    $test = ['POST' => 'Hello World!'];
+    if($test != null) {
+        return $res->status(200)->json($test);
+    }
+    return $res->status(400)->json();
 });
 
-$router->post('/model/{id}', function($req, $res) {
-    echo 'actionnnn';
+$router->patch('/model/{id}/', function ($req, $res) {
+    $test = ['PATCH' => 'Hello World!'];
+    if($test != null) {
+        return $res->status(200)->json($test);
+    }
+    return $res->status(400)->json();
 });
 
-$router->get('/model', function($req, $res) {
-    echo '/model/';
+$router->delete('/model/{id}/', function ($req, $res) {
+    $test = ['DELETE' => 'Hello World!'];
+    if($test != null) {
+        return $res->status(200)->json($test);
+    }
+    return $res->status(400)->json();
 });
 
 $router->listen();
