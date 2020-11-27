@@ -1,21 +1,43 @@
 <?php
 
-$method = $_SERVER['REQUEST_METHOD'];
-$uri = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : $_SERVER['REQUEST_URI'];
-
-class Router
+class Route
 {
-    public $routes = [];
-    private $request = [];
-    private $response = [];
+    public $url = '';
+    public $methods = [];
 
-    public function __construct($URI, $HTTP_METHOD)
+    public function __construct($url, $method, $callback)
     {
-        $this->request['url'] = $this->clean_uri($URI);
-        $this->request['method'] = $HTTP_METHOD ;
+        $this->url = $url;
+        $this->methods[$method] = $callback;
     }
 
-    public function clean_uri($uri)
+    public function setMethod($method, $callback)
+    {
+        if(!isset($this->methods[$method])){
+            return $this->methods[$method] = $callback;
+            var_dump($this->methods);
+        }
+        return null;
+    }
+}
+
+class Request
+{
+    public $url = '';
+    public $method = '';
+    public $body = [];
+    public $params = [];
+    public $query = [];
+
+    public function __construct($req)
+    {
+        $this->url = $this->clean_url($req['url']);
+        $this->method = $req['method'];
+        $this->query = $req['query'];
+        $this->body = $req['body'];
+    }
+
+    public function clean_url ($uri)
     {
         $str = substr($uri, -1);
         if($str !== '/') {
@@ -24,58 +46,115 @@ class Router
         return $uri;
     }
 
-    public function get($url, $callback, $method='GET')
+    public function clean_params ($url)
     {
-        $url = $this->generate_regex($url);
-        $this->routes[] = [ 'callback' => $callback, 'url' => $url ];
+        // /^\/model\/([0-9]*)\/$/
+        $match = [];
+        $url = str_replace('*', '', $url);
+        $url = str_replace('[', '([', $url);
+        $url = str_replace(']', ']*)', $url);
+        preg_match($url, $this->url, $match);
+        $this->params = array_values(array_filter($match, 'is_numeric'));
     }
+}
 
-    public function generate_regex($url)
+class Response
+{
+    public function render($callback)
     {
-        $url = rtrim($url);
-        $base = '/^~$/';
-        if (preg_match('/\/\{.*\}\//', $url)) {
-            //  /^\/model\/[0-9]*\/$/
-            $url = str_replace('/', '\/', $url);
-            if(substr($url, -1) !== '/') {
-                $str = substr($url, -1);
-                $url = preg_replace("/$str$/", "$str\/", $url);
-            }
-            $url = preg_replace('/\{.*\}/', '[0-9]*', $url);
-            
-            return str_replace('~', $url, $base);
-        }
-        //  /^\/model\/$/
-        $url = str_replace('/', '\/', $url);
-        if(substr($url, -1) !== '/') {
-            $str = substr($url, -1);
-            $url = preg_replace("/$str$/", "$str\/", $url);
-        }
-        return str_replace('~', $url, $base);
-    }
-
-    public function listen()
-    {
-        array_map(function ($route) {
-            if(preg_match($route['url'], $this->request['url'])) {
-                $this->response['callback'] = $route['callback'];
-            }
-        }, $this->routes);
-        if(isset($this->response['callback'])) {
-            $this->response['callback']();
+        if(isset($callback)){
+            $callback();
         } else {
             echo '404';
         }
     }
 }
 
-$router = new Router($uri, $method);
+$reqParams = [
+    'body' => $_POST,
+    'query' => $_GET,
+    'url' => isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : $_SERVER['REQUEST_URI'],
+    'method' => $_SERVER['REQUEST_METHOD']
+];
 
-$router->get('/model/{outro}/', function () {
+$request = new Request($reqParams);
+$response = new Response();
+
+class Router
+{
+    public $routes = [];
+    private $request = [];
+    private $response = [];
+
+    public function __construct($request, $response)
+    {
+        $this->request = $request;
+        $this->response = $response;
+    }
+
+    public function get($url, $callback, $method='GET')
+    {
+        $url = $this->generate_regex($url);
+        $this->addRoute($url, $method, $callback);
+    }
+
+    public function post($url, $callback, $method='POST')
+    {
+        $url = $this->generate_regex($url);
+        $this->addRoute($url, $method, $callback);
+    }
+
+    public function addRoute($url, $method ,$callback)
+    {
+        if(isset($this->routes[$url])) {
+            return $this->routes[$url]->setMethod($method, $callback);
+        }
+        
+        return $this->routes[$url] = new Route($url, $method, $callback);
+    }
+
+    public function generate_regex($url)
+    {
+        $url = rtrim($url);
+        $base = '/^~$/';
+        $url = str_replace('/', '\/', $url);
+        if(substr($url, -1) !== '/') {
+            $str = substr($url, -1);
+            $url = preg_replace("/$str$/", "$str\/", $url);
+        }
+        $url = preg_replace('/\{(\w*)\}/', '[0-9]*', $url);
+        return str_replace('~', $url, $base);
+    }
+
+    public function listen()
+    {
+        $notFound = True;
+        foreach($this->routes as $route) {
+            $method = $this->request->method;
+            if(preg_match($route->url, $this->request->url)) {
+                $this->request->clean_params($route->url);
+                $this->response->render($route->methods[$method]);
+                $notFound = False;
+                break;
+            }
+        }
+        if($notFound) {
+            $this->response->render(null);
+        }
+    }
+}
+
+$router = new Router($request, $response);
+
+$router->get('/model/{id}/', function () {
     echo 'hello';
 });
 
-$router->get('/model/{outro}', function() {
+$router->get('/model/{id}/test/{test}/', function () {
+    echo 'the separeteed';
+});
+
+$router->post('/model/{id}', function() {
     echo 'actionnnn';
 });
 
