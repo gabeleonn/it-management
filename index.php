@@ -45,4 +45,8 @@ $router->delete('/model/{id}/', function ($req, $res) {
     return $res->status(400)->json();
 });
 
+$router->get('/model/{id}/test/{oloko}', function ($req, $res) {
+    echo 'okay';
+});
+
 $router->listen();
