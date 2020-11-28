@@ -15,10 +15,11 @@ $router = new Core\Router($request, $response);
 
 $router->get('/model/{id}/', function ($req, $res) {
     $test = ['name' => 'Hello World!'];
-    if($test != null) {
-        return $res->status(200)->json($test);
-    }
-    return $res->status(400)->json();
+    var_dump($req->params);
+    // if($test != null) {
+    //     return $res->status(200)->json($test);
+    // }
+    // return $res->status(400)->json();
 });
 
 $router->post('/model/{id}/', function ($req, $res) {
@@ -46,6 +47,7 @@ $router->delete('/model/{id}/', function ($req, $res) {
 });
 
 $router->get('/model/{id}/test/{oloko}', function ($req, $res) {
+    var_dump($req->params);
     echo 'okay';
 });
 

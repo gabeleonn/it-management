@@ -7,10 +7,11 @@ class Route
     public $methods = [];
     public $params = [];
 
-    public function __construct($url, $method, $callback)
+    public function __construct($url, $method, $callback, $params)
     {
         $this->url = $url;
         $this->methods[$method] = $callback;
+        $this->params = $params;
     }
 
     public function setMethod($method, $callback)

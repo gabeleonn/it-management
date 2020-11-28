@@ -26,14 +26,19 @@ class Request
         return $uri;
     }
 
-    public function clean_params ($url)
+    public function clean_params ($url, $params)
     {
         // /^\/model\/([0-9]*)\/$/
+        $index = 0;
         $match = [];
         $url = str_replace('*', '', $url);
         $url = str_replace('[', '([', $url);
         $url = str_replace(']', ']*)', $url);
         preg_match($url, $this->url, $match);
-        $this->params = array_values(array_filter($match, 'is_numeric'));
+        $match = array_values(array_filter($match, 'is_numeric'));
+        foreach($params as $key) {
+            $this->params[$key] = $match[$index];
+            $index++;
+        }
     }
 }

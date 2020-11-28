@@ -50,22 +50,11 @@ class Router
 
     public function generate_params($url)
     {
-        $url = explode('{', $url);
-        $url = array_values(array_filter($url, function($item) {
-            return strpos($item, '}');
-        }));
-        $params = [];
-        foreach($url as $uri) {
-            $params[] = explode('}', $uri); 
-        }
-
-        $params = array_values(array_filter($params, function($item) {
-            return !strpos($item, '/'); // continua aqui
-        }));
-        
-        echo '<pre>';    
-        var_dump($params);
-        echo '</pre>';    
+        $matches = [];
+        $url = str_replace('{', '-', $url);
+        $url = str_replace('}', '-', $url);
+        preg_match_all('/\-(.*?)\-/', $url, $matches);
+        return $matches[1];  
     }
 
     public function generate_regex($url)
@@ -92,7 +81,7 @@ class Router
         foreach($this->routes as $route) {
             $method = $this->request->method;
             if(preg_match($route->url, $this->request->url)) {
-                $this->request->clean_params($route->url);
+                $this->request->clean_params($route->url, $route->params);
                 $this->set_route($route->methods[$method]);
                 $notFound = False;
                 break;
