@@ -8,6 +8,7 @@ class Request
     public $body = [];
     public $params = [];
     public $query = [];
+    public $token = NULL;
 
     public function __construct($req)
     {
@@ -15,6 +16,12 @@ class Request
         $this->method = $req['method'];
         $this->query = $req['query'];
         $this->body = $req['body'];
+        $this->token = $this->clean_token($req['token']);
+    }
+
+    public function clean_token($token)
+    {
+        return $token != NULL ? explode(' ', $token)[1] : NULL;        
     }
 
     public function clean_url ($uri)

@@ -75,6 +75,16 @@ class Router
         }
     }
 
+    public function authenticate()
+    {
+        return $this;
+        // if($this->request->token != NULL) {
+        //     return $this;
+        // } else {
+        //     $this->set_route(null);
+        // }
+    }
+
     public function listen()
     {
         $notFound = True;

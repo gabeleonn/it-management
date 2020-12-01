@@ -1,15 +1,5 @@
 <?php
-require_once('vendor/autoload.php');
-
-$reqParams = [
-    'body' => $_POST,
-    'query' => $_GET,
-    'url' => isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : $_SERVER['REQUEST_URI'],
-    'method' => $_SERVER['REQUEST_METHOD']
-];
-
-$request = new Core\Request($reqParams);
-$response = new Core\Response();
+require_once('setup.php');
 
 $router = new Core\Router($request, $response);
 
@@ -45,8 +35,10 @@ $router->delete('/model/{id}/', function ($req, $res) {
     return $res->status(400)->json();
 });
 
-$router->get('/model/{id}/test/{oloko}', function ($req, $res) {
-    echo 'okay';
+$router->authenticate()->get('/model/{id}/test/{oloko}', function ($req, $res) {
+    $test = new Core\Model();
+    $test->from_json('{ "name": "gabriel", "age": 22 }');
+    return $res->status(200)->json($test->to_json());
 });
 
 $router->listen();
