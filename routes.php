@@ -36,9 +36,9 @@ $router->delete('/model/{id}/', function ($req, $res) {
 });
 
 $router->authenticate()->get('/model/{id}/test/{oloko}', function ($req, $res) {
-    $test = new Core\Model();
-    $test->from_json('{ "name": "gabriel", "age": 22 }');
-    return $res->status(200)->json($test->to_json());
+    $user = new User\Model();
+    $user->test(); 
+    return $res->status(200)->json("hello");
 });
 
 $router->listen();

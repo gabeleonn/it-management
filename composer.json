@@ -2,6 +2,9 @@
     "name": "gabeleonn/it-management",
     "description": "Web API for IT inventory management and in a future maybe a helpdesk API too.",
     "autoload": {
-        "psr-4": {"Core\\": "App/"}
+        "psr-4": {
+            "Core\\": "App/",
+            "User\\": "Entities/User/"
+        }
     }
 }
