@@ -36,9 +36,10 @@ $router->delete('/model/{id}/', function ($req, $res) {
 });
 
 $router->authenticate()->get('/model/{id}/test/{oloko}', function ($req, $res) {
-    $user = new User\Model();
-    $user->test(); 
-    return $res->status(200)->json("hello");
+    $user = new User\Model('users');
+    $user->name = "Gabriel Leon";
+    $user->save();
+    return $res->status(200)->json($user->getMany());
 });
 
 $router->listen();

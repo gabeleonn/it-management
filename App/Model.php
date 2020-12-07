@@ -5,10 +5,12 @@ namespace Core;
 class Model
 {
     private $attributes = [];
-    private $conn;
+    private $model = '';
+    protected $conn;
 
-    public function __construct()
+    public function __construct($model)
     {
+        $this->model = $model;
         $this->conn = new Connection();
     }
 
@@ -31,11 +33,15 @@ class Model
 
     public function __set($attribute, $value)
     {
-        $this->attributes[$attribute] = $value;
+        $this->attributes[':' . $attribute] = $value;
     }
 
     public function __get($attribute)
     {
+        if($attribute == "attributes")
+        {
+            return $this->attributes;
+        }
         return $this->attributes[$attribute];
     }
     
