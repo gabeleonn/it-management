@@ -3,43 +3,21 @@ require_once('setup.php');
 
 $router = new Core\Router($request, $response);
 
-$router->get('/model/{id}/', function ($req, $res) {
-    $test = ['name' => 'Hello World!'];
-    if($test != null) {
-        return $res->status(200)->json($test);
-    }
-    return $res->status(400)->json();
-});
-
-$router->post('/model/{id}/', function ($req, $res) {
-    $test = ['POST' => 'Hello World!'];
-    if($test != null) {
-        return $res->status(200)->json($test);
-    }
-    return $res->status(400)->json();
-});
-
-$router->patch('/model/{id}/', function ($req, $res) {
-    $test = ['PATCH' => 'Hello World!'];
-    if($test != null) {
-        return $res->status(200)->json($test);
-    }
-    return $res->status(400)->json();
-});
-
-$router->delete('/model/{id}/', function ($req, $res) {
-    $test = ['DELETE' => 'Hello World!'];
-    if($test != null) {
-        return $res->status(200)->json($test);
-    }
-    return $res->status(400)->json();
-});
-
-$router->authenticate()->get('/model/{id}/test/{oloko}', function ($req, $res) {
-    $user = new User\Model('users');
-    $user->name = "Gabriel Leon";
-    $user->save();
-    return $res->status(200)->json($user->getMany());
+$router->get('/user/', function ($req, $res) {
+    //GET MANY with all configs
+    $users = User\Model::getMany(
+        $where = 'name = mark',
+        $orderby = ['name', 'ASC'],
+        $limit = 100
+    );
+    // GET MANY with no configs
+    $users = User\Model::getMany();
+    //GET ONE
+    $user = User\Model::getUserById(5);
+    //$user->name = 'Leon';
+    //$user->update();
+    //$user->delete();
+    return $res->status(200)->json($user->as_array());
 });
 
 $router->listen();
