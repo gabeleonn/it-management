@@ -7,6 +7,7 @@ class Response
     private $messages = [
         200 => '',
         201 => 'Criado com sucesso.',
+        204 => 'Sem resposta.',
         400 => 'Requisição inválida.',
         401 => 'Acesso negado.',
         500 => 'Erro interno.'
