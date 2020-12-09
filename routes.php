@@ -13,8 +13,10 @@ $router->get('/users/', function ($req, $res) {
     //     $limit = 100
     // );
     $users = User\Model::getMany();
-    //GET ONE
-    return $res->status(200)->json($users);
+    if($users != NULL) {
+        return $res->status(200)->json($users);
+    }
+    return $res->status(400)->json();
 });
 
 $router->get('/users/{id}', function ($req, $res)
@@ -25,7 +27,7 @@ $router->get('/users/{id}', function ($req, $res)
     //$user->delete();
     $id = $req->params['id'];
     $user = User\Model::getUserById($id);
-    if($user->id == $id) {
+    if($user !== NULL) {
         return $res->status(200)->json($user->as_array());
     }
     return $res->status(400)->json();

@@ -71,7 +71,8 @@ class Model extends \Core\Model
             $order = isset($orderby) ? 'ORDER BY ' . "$orderby[0] $orderby[1]" : 'ORDER BY id ASC';
             $limit = isset($limit) ? 'LIMIT ' . $limit : 'LIMIT 100';
             $q = "SELECT * FROM users $where $order $limit;";
-            return $conn->execute($q);
+            $res = $conn->execute($q);
+            return $res;
         } catch (\Throwable $th) {
             return null;
         }
@@ -82,19 +83,23 @@ class Model extends \Core\Model
     {
         try {
             $conn = new \Core\Connection();
-            $where = "WHERE id = $id";
-            $q = "SELECT * FROM users $where LIMIT 1;";
-            $userArray = isset($conn->execute($q)[0]) ? $conn->execute($q)[0] : null;
-            if($userArray != NULL) {
-                $user = new Model();
-                foreach($userArray as $key => $value) {
-                    $user->$key = $value;
+            if(isset($id)) {
+                $where = "WHERE id = $id";
+                $q = "SELECT * FROM users $where LIMIT 1;";
+                $userArray = isset($conn->execute($q)[0]) ? $conn->execute($q)[0] : null;
+                if($userArray != NULL) {
+                    $user = new Model();
+                    foreach($userArray as $key => $value) {
+                        $user->$key = $value;
+                    }
+                    return $user;
                 }
-                return $user;
+                return NULL;
             }
-            return null;
+            
+            return NULL;
         } catch (\Throwable $th) {
-            return null;
+            return NULL;
         }
         
     }
